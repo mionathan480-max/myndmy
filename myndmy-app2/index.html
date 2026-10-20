@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#7491ff">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Myndmy">
 <meta name="format-detection" content="telephone=no">
 <meta name="description" content="Myndmy — comprends tes rythmes naturels et vis en accord avec toi-même.">
 <link rel="manifest" href="manifest.webmanifest">
@@ -2202,6 +2205,17 @@ button, .nav-item, .pg-chip, .pg-todo, .pg-hub-mini, .bz-hub-card, [onclick]{ to
 .pg-toggle.on::after{ transform:translateX(20px); }
 .pg-time{ border:1.5px solid #e7ecfb; background:#f8faff; border-radius:12px; padding:8px 10px; font-family:inherit; color:#3a3a5c; font-weight:600; }
 
+/* barre d'état iOS : même couleur que le thème + voile flouté quand le contenu défile dessous */
+html{ background: #e8f2fb; }
+#sat-scrim{ display:none; }
+@media (max-width: 500px){
+  #sat-scrim{ display:block; position:fixed; top:0; left:0; right:0; height:var(--sat); z-index:900; pointer-events:none;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ac-soft, #e8f2fb) 70%, #fff) 0%, color-mix(in srgb, var(--ac-soft, #e8f2fb) 55%, transparent) 100%);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent); mask-image: linear-gradient(180deg, #000 70%, transparent); }
+  .screen{ padding-top: calc(var(--sat) + 14px) !important; }
+}
+
 /* ═══════════ POLISH — même identité, finitions ═══════════ */
 body{
   --ac: var(--azur, #7491ff);
@@ -2317,6 +2331,22 @@ body{
   .phone::before, .ob-btn::after{ animation:none !important; }
   .bz-page.pg-enter .bz-scroll > *, .ob-screen.active > *{ animation:none !important; }
 }
+
+/* menu du bas : plus lisible, le contenu ne se mélange plus dessous */
+.bottom-nav{
+  background: linear-gradient(180deg, rgba(255,255,255,.93), rgba(255,255,255,.86)) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(170%) !important; backdrop-filter: blur(26px) saturate(170%) !important;
+}
+.bottom-nav::after{
+  content:''; position:absolute; left:-20px; right:-20px; bottom:calc(100% - 6px); height:34px; z-index:-1; pointer-events:none;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--ac-soft, #e8f2fb) 85%, #fff));
+}
+.screen{ padding-bottom: 12px; }
+
+/* plus d'espace entre le contenu et le menu */
+.bottom-nav{ margin-top: 30px !important; }
+@media (max-width:500px){ .bottom-nav{ bottom: calc(var(--sab) + 12px) !important; } }
+.screen{ padding-bottom: 20px; }
 
 </style>
 </head>
@@ -6339,6 +6369,24 @@ body{
   });
 
   window.pgMobile = { installApp, toggleReminder, setReminderTime, exportData };
+})();
+
+/* thème : couleur de la barre d'état + fond de page synchronisés */
+(function(){
+  var s = document.createElement('div'); s.id = 'sat-scrim'; document.body.appendChild(s);
+  var meta = document.querySelector('meta[name="theme-color"]');
+  function sync(){
+    try {
+      var ph = document.querySelector('.phone'); if(!ph) return;
+      var cs = getComputedStyle(ph);
+      document.documentElement.style.background = cs.backgroundImage !== 'none' ? cs.backgroundImage : cs.backgroundColor;
+      document.documentElement.style.backgroundAttachment = 'fixed';
+      var m = (cs.backgroundImage.match(/rgb[a]?\([^)]*\)/) || [cs.backgroundColor])[0];
+      if (meta && m) meta.setAttribute('content', m);
+    } catch(e){}
+  }
+  new MutationObserver(sync).observe(document.body, { attributes:true, attributeFilter:['class'] });
+  sync(); setTimeout(sync, 800);
 })();
 
 </script>
