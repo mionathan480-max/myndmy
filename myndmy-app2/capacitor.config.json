@@ -1,0 +1,13 @@
+{
+  "appId": "com.myndmy.app",
+  "appName": "Myndmy",
+  "webDir": "www",
+  "backgroundColor": "#ddeaf8",
+  "server": { "androidScheme": "https", "iosScheme": "myndmy" },
+  "ios": { "contentInset": "always", "limitsNavigationsToAppBoundDomains": false },
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 0 },
+    "LocalNotifications": { "iconColor": "#7491ff" }
+  }
+}
